@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New York Times Co. v. Sullivan (1964) | First Amendment Landmark Case</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Anime.js for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- ECharts for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0c1a31;
+            --secondary-blue: #1a2d4a;
+            --accent-gold: #d4af37;
+            --light-gold: #f4e4a6;
+            --dark-gold: #b8941f;
+            --text-light: #f5f5f5;
+            --text-gray: #b0b0b0;
+        }
+        
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background-color: #0c1a31;
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+        
+        .nav-gradient {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0e1f3a 100%);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #14294d 100%);
+        }
+        
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2.5rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 70px;
+            height: 3px;
+            background-color: var(--accent-gold);
+        }
+        
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 完全复刻原网站的术语卡片翻转设计 */
+        .term-card {
+            height: 280px;
+            perspective: 1000px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .term-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            border-radius: 10px;
+        }
+        
+        .term-card:hover .term-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .term-card-front, .term-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+        
+        .term-card-front {
+            background: linear-gradient(145deg, #1a2d4a, #15243d);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            color: white;
+        }
+        
+        .term-card-back {
+            background: linear-gradient(145deg, #0c1a31, #0a1529);
+            color: white;
+            transform: rotateY(180deg);
+            border: 2px solid var(--accent-gold);
+            overflow-y: auto;
+        }
+        
+        .term-card-back::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .term-card-back::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        
+        .term-card-back::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 3px;
+        }
+        
+        .term-card-front h4 {
+            color: var(--accent-gold);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .term-card-front p {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+        }
+        
+        .flip-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            width: 100%;
+            color: var(--accent-gold);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .timeline-axis {
+            position: relative;
+            height: 450px;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: var(--accent-gold);
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            position: absolute;
+            width: 45%;
+            padding: 1.2rem;
+            border-radius: 8px;
+            background-color: rgba(26, 45, 74, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .timeline-item-left {
+            left: 0;
+            text-align: right;
+        }
+        
+        .timeline-item-right {
+            right: 0;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: var(--accent-gold);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
+        }
+        
+        .timeline-dot-left {
+            right: -8px;
+        }
+        
+        .timeline-dot-right {
+            left: -8px;
+        }
+        
+        .advertisement-newspaper {
+            background-color: #f5f0e1;
+            color: #222;
+            font-family: 'Times New Roman', serif;
+            padding: 2.5rem;
+            border: 2px solid #8b7355;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            line-height: 1.7;
+            max-width: 850px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .advertisement-title {
+            font-family: 'Times New Roman', serif;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            color: #000;
+            border-bottom: 2px solid #8b7355;
+            padding-bottom: 0.5rem;
+        }
+        
+        .advertisement-text {
+            column-count: 2;
+            column-gap: 2.5rem;
+        }
+        
+        .ad-highlight {
+            background-color: rgba(212, 175, 55, 0.3);
+            padding: 0 3px;
+            cursor: pointer;
+            border-bottom: 1px dashed var(--accent-gold);
+            transition: background-color 0.2s;
+        }
+        
+        .ad-highlight:hover {
+            background-color: rgba(212, 175, 55, 0.6);
+        }
+        
+        .fact-check-card {
+            position: absolute;
+            background: linear-gradient(145deg, #0c1a31, #0a1529);
+            border: 2px solid var(--accent-gold);
+            border-radius: 10px;
+            padding: 1.2rem;
+            width: 320px;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+        
+        .argument-card {
+            border-radius: 10px;
+            padding: 1.8rem;
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .argument-card-left {
+            background: linear-gradient(145deg, rgba(139, 0, 0, 0.1), rgba(139, 0, 0, 0.2));
+            border: 1px solid rgba(139, 0, 0, 0.5);
+        }
+        
+        .argument-card-right {
+            background: linear-gradient(145deg, rgba(0, 100, 0, 0.1), rgba(0, 100, 0, 0.2));
+            border: 1px solid rgba(0, 100, 0, 0.5);
+        }
+        
+        .quiz-option {
+            padding: 1.2rem;
+            margin-bottom: 0.9rem;
+            border-radius: 8px;
+            background-color: rgba(26, 45, 74, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quiz-option:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+        
+        .correct-answer {
+            background-color: rgba(0, 180, 0, 0.3) !important;
+            border-color: rgba(0, 255, 0, 0.7) !important;
+            color: #b0ffb0 !important;
+        }
+        
+        .wrong-answer {
+            background-color: rgba(220, 0, 0, 0.3) !important;
+            border-color: rgba(255, 0, 0, 0.7) !important;
+            color: #ffb0b0 !important;
+        }
+        
+        .vote-option {
+            padding: 1.2rem;
+            border-radius: 8px;
+            background-color: rgba(26, 45, 74, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .vote-option:hover {
+            transform: scale(1.03);
+            background-color: rgba(212, 175, 55, 0.1);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+        
+        .vote-yes:hover {
+            background-color: rgba(0, 150, 0, 0.2);
+            border-color: rgba(0, 255, 0, 0.6);
+        }
+        
+        .vote-no:hover {
+            background-color: rgba(220, 0, 0, 0.2);
+            border-color: rgba(255, 0, 0, 0.6);
+        }
+        
+        .case-connection-chart {
+            height: 500px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .phrase-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        
+        .phrase-table th {
+            background-color: rgba(26, 45, 74, 0.8);
+            padding: 1rem;
+            text-align: left;
+            color: var(--accent-gold);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .phrase-table td {
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            vertical-align: top;
+        }
+        
+        .phrase-table tr:hover {
+            background-color: rgba(212, 175, 55, 0.05);
+        }
+        
+        .sentence-pattern {
+            background: linear-gradient(145deg, #1a2d4a, #15243d);
+            border-radius: 10px;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent-gold);
+        }
+        
+        @media (max-width: 768px) {
+            .advertisement-text {
+                column-count: 1;
+            }
+            
+            .timeline-axis {
+                height: 650px;
+            }
+            
+            .timeline-item {
+                width: 90%;
+                position: relative;
+                margin-bottom: 2.5rem;
+                left: 5% !important;
+                right: auto !important;
+                text-align: left !important;
+            }
+            
+            .timeline-dot {
+                display: none;
+            }
+            
+            .timeline-line {
+                left: 30px;
+            }
+            
+            .term-card {
+                height: 250px;
+            }
+        }
+        
+        /* 原网站特有的设计元素 */
+        .gold-accent {
+            color: var(--accent-gold);
+        }
+        
+        .gold-border {
+            border-color: var(--accent-gold);
+        }
+        
+        .gold-bg {
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+        
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+            margin: 3rem 0;
+        }
+        
+        .hover-glow {
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .hover-glow:hover {
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+        
+        .scenario-correct {
+            background-color: rgba(0, 180, 0, 0.3) !important;
+            border-color: rgba(0, 255, 0, 0.7) !important;
+            color: #b0ffb0 !important;
+        }
+        
+        .scenario-wrong {
+            background-color: rgba(220, 0, 0, 0.3) !important;
+            border-color: rgba(255, 0, 0, 0.7) !important;
+            color: #ffb0b0 !important;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        
+        .reset-btn:hover {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.4);
+        }
+        
+        .reset-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <!-- Navigation Bar -->
+    <nav class="nav-gradient shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-yellow-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fas fa-balance-scale text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-tight">NYT v. Sullivan</h1>
+                        <p class="text-sm text-amber-300 tracking-wide">First Amendment Landmark Case</p>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex space-x-10">
+                    <a href="#design" class="text-gray-200 hover:text-amber-300 transition font-medium tracking-wide">Design Information</a>
+                    <a href="#facts" class="text-gray-200 hover:text-amber-300 transition font-medium tracking-wide">Facts</a>
+                    <a href="#key-elements" class="text-gray-200 hover:text-amber-300 transition font-medium tracking-wide">Key Elements</a>
+                    <a href="#knowledge" class="text-gray-200 hover:text-amber-300 transition font-medium tracking-wide">Legal Knowledge</a>
+                    <a href="#interactive" class="text-gray-200 hover:text-amber-300 transition font-medium tracking-wide">Interactive Learning</a>
+                </div>
+                
+                <button id="mobileMenuBtn" class="md:hidden text-amber-300">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden hidden mt-4 pb-4 border-t border-gray-700 pt-4">
+                <div class="flex flex-col space-y-4">
+                    <a href="#design" class="text-gray-200 hover:text-amber-300 transition font-medium">Design Information</a>
+                    <a href="#facts" class="text-gray-200 hover:text-amber-300 transition font-medium">Facts</a>
+                    <a href="#key-elements" class="text-gray-200 hover:text-amber-300 transition font-medium">Key Elements</a>
+                    <a href="#knowledge" class="text-gray-200 hover:text-amber-300 transition font-medium">Legal Knowledge</a>
+                    <a href="#interactive" class="text-gray-200 hover:text-amber-300 transition font-medium">Interactive Learning</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-gradient py-20 md:py-28 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z" fill="%23d4af37" fill-opacity="0.4" fill-rule="evenodd"/%3E%3C/svg%3E');"></div>
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h1 class="text-5xl md:text-7xl font-bold mb-8 tracking-tight">New York Times Co. v. Sullivan (1964)</h1>
+            <p class="text-2xl md:text-3xl text-amber-300 mb-10 font-light tracking-wide">A Landmark Case for the U.S. First Amendment</p>
+            <div class="max-w-4xl mx-auto">
+                <p class="text-xl mb-10 leading-relaxed">This landmark Supreme Court decision established the "actual malice" standard, which requires public officials to prove that defamatory statements were made with knowledge of their falsity or with reckless disregard for the truth. This ruling significantly strengthened First Amendment protections for freedom of the press.</p>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <a href="#key-elements" class="bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg hover:shadow-xl">Explore the Case</a>
+                    <a href="#interactive" class="border-2 border-amber-600 text-amber-300 hover:bg-amber-900 hover:bg-opacity-30 font-bold py-3 px-8 rounded-lg transition shadow-lg hover:shadow-xl">Take a Quiz</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Design Information Section -->
+        <section id="design" class="py-20 bg-gradient-to-b from-gray-900 to-gray-800">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-4xl font-bold mb-16 text-center">Design Information</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto">
+                    <div class="space-y-8">
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800 card-hover hover-glow">
+                            <h3 class="text-2xl font-bold mb-4 text-amber-300">Designer</h3>
+                            <p class="text-xl">Runhan Zhang</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800 card-hover hover-glow">
+                            <h3 class="text-2xl font-bold mb-4 text-amber-300">Design Tools</h3>
+                            <p class="text-xl">WPS, Deepseek, HTML5, GitHub</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-8">
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800 card-hover hover-glow">
+                            <h3 class="text-2xl font-bold mb-4 text-amber-300">Design Methodology</h3>
+                            <p class="text-xl">User-Centered Design, Responsive Design, Progressive Enhancement, Visual Hierarchy</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800 card-hover hover-glow">
+                            <h3 class="text-2xl font-bold mb-4 text-amber-300">Design Process</h3>
+                            <p class="text-xl">Content Structure Planning, Interaction Design, Visual Design, Development Implementation</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Facts Section -->
+        <section id="facts" class="py-20 bg-gradient-to-b from-gray-800 to-gray-900">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-4xl font-bold mb-16 text-center">Facts</h2>
+                
+                <!-- Case Timeline -->
+                <div class="mb-20">
+                    <h3 class="text-3xl font-bold mb-10 text-amber-300 text-center">Case Timeline</h3>
+                    <div class="timeline-axis">
+                        <div class="timeline-line"></div>
+                        
+                        <div class="timeline-item timeline-item-left" style="top: 0;">
+                            <div class="timeline-dot timeline-dot-left"></div>
+                            <h4 class="font-bold text-xl gold-accent">March 29, 1960</h4>
+                            <p class="font-semibold text-lg">Publication of the Advertisement</p>
+                            <p>The full-page advertisement "Heed Their Rising Voices" is published in The New York Times.</p>
+                            <p class="text-gray-400 mt-3 italic">广告刊登 – 《纽约时报》刊登整版广告《倾听他们崛起的声音》.</p>
+                        </div>
+                        
+                        <div class="timeline-item timeline-item-right" style="top: 110px;">
+                            <div class="timeline-dot timeline-dot-right"></div>
+                            <h4 class="font-bold text-xl gold-accent">April 26, 1960</h4>
+                            <p class="font-semibold text-lg">Lawsuit Filed</p>
+                            <p>Sullivan files a libel suit in Alabama state court, seeking $500,000 in damages.</p>
+                            <p class="text-gray-400 mt-3 italic">提起诉讼 – 沙利文在阿拉巴马州法院提起诽谤诉讼，索赔50万美元.</p>
+                        </div>
+                        
+                        <div class="timeline-item timeline-item-left" style="top: 220px;">
+                            <div class="timeline-dot timeline-dot-left"></div>
+                            <h4 class="font-bold text-xl gold-accent">November 3, 1960</h4>
+                            <p class="font-semibold text-lg">State Trial Verdict</p>
+                            <p>An Alabama jury finds for Sullivan and awards the full $500,000.</p>
+                            <p class="text-gray-400 mt-3 italic">州法院判决 – 阿拉巴马州陪审团裁定沙利文胜诉，获赔全额50万美元.</p>
+                        </div>
+                        
+                        <div class="timeline-item timeline-item-right" style="top: 330px;">
+                            <div class="timeline-dot timeline-dot-right"></div>
+                            <h4 class="font-bold text-xl gold-accent">March 9, 1964</h4>
+                            <p class="font-semibold text-lg">Landmark Ruling</p>
+                            <p>The Supreme Court unanimously reverses the Alabama judgment, establishing the "actual malice" standard.</p>
+                            <p class="text-gray-400 mt-3 italic">里程碑式裁决 – 最高法院一致推翻阿拉巴马州的判决，确立了"实际恶意"标准.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Advertisement -->
+                <div class="mb-20">
+                    <h3 class="text-3xl font-bold mb-10 text-amber-300 text-center">Original Advertisement</h3>
+                    <p class="mb-8 text-xl text-center max-w-3xl mx-auto">Replica of The New York Times full-page advertisement from March 29, 1960. Click on highlighted text to see fact-checking information.</p>
+                    
+                    <div class="advertisement-newspaper hover-glow">
+                        <div class="advertisement-title">HEED THEIR RISING VOICES</div>
+                        
+                        <div class="advertisement-text">
+                            <p>"In Montgomery, Alabama, after students sang <span class="ad-highlight" data-fact="1">'My Country, 'Tis of Thee'</span> on the State Capitol steps, their leaders were expelled from school, and truckloads of police armed with shotguns and tear-gas <span class="ad-highlight" data-fact="2">ringed the Alabama State College Campus</span>. When the entire student body protested to state authorities by refusing to re-register, <span class="ad-highlight" data-fact="3">their dining hall was padlocked</span> in an attempt to starve them into submission."</p>
+                            
+                            <p>"Again and again the Southern violators have answered Dr. King's peaceful protests with intimidation and violence. They have bombed his home almost killing his wife and child. They have assaulted his person. They have arrested him <span class="ad-highlight" data-fact="4">seven times</span>—for 'speeding,' 'loitering' and similar 'offenses.' And now they have charged him with 'perjury'—a felony under which they could imprison him for ten years...."</p>
+                        </div>
+                        
+                        <div class="mt-8 pt-4 border-t border-gray-400 text-sm text-center text-gray-600">
+                            The New York Times, March 29, 1960, Page 25
+                        </div>
+                    </div>
+                    
+                    <!-- Fact Check Cards -->
+                    <div id="factCheckCard1" class="fact-check-card">
+                        <h4 class="font-bold text-xl mb-3 text-amber-300">Fact Check: 'My Country, 'Tis of Thee'</h4>
+                        <p class="mb-3">The students sang the national anthem "The Star-Spangled Banner", not "My Country, 'Tis of Thee".</p>
+                        <p class="text-gray-400 italic">事实核查：学生当时唱的是美国国歌《星条旗永不落》，而非《我的祖国，属于你》.</p>
+                        <button class="mt-4 text-amber-300 hover:text-amber-400 font-medium close-fact">Close <i class="fas fa-times ml-1"></i></button>
+                    </div>
+                    
+                    <div id="factCheckCard2" class="fact-check-card">
+                        <h4 class="font-bold text-xl mb-3 text-amber-300">Fact Check: 'ringed the Alabama State College Campus'</h4>
+                        <p class="mb-3">Police were deployed near campus on several occasions but never "ringed" the campus at any time.</p>
+                        <p class="text-gray-400 italic">事实核查：警方曾数次在校园附近大规模部署，但从未在任何时间形成"包围"态势.</p>
+                        <button class="mt-4 text-amber-300 hover:text-amber-400 font-medium close-fact">Close <i class="fas fa-times ml-1"></i></button>
+                    </div>
+                    
+                    <div id="factCheckCard3" class="fact-check-card">
+                        <h4 class="font-bold text-xl mb-3 text-amber-300">Fact Check: 'their dining hall was padlocked'</h4>
+                        <p class="mb-3">The campus dining hall was never padlocked. All students had access.</p>
+                        <p class="text-gray-400 italic">事实核查：校园食堂从未被锁上。任何学生均可进入.</p>
+                        <button class="mt-4 text-amber-300 hover:text-amber-400 font-medium close-fact">Close <i class="fas fa-times ml-1"></i></button>
+                    </div>
+                    
+                    <div id="factCheckCard4" class="fact-check-card">
+                        <h4 class="font-bold text-xl mb-3 text-amber-300">Fact Check: 'seven times'</h4>
+                        <p class="mb-3">At the time of the advertisement, Dr. Martin Luther King Jr. had actually been arrested four times, not seven.</p>
+                        <p class="text-gray-400 italic">事实核查：在广告刊登时，马丁·路德·金博士实际被捕次数为四次，而非七次.</p>
+                        <button class="mt-4 text-amber-300 hover:text-amber-400 font-medium close-fact">Close <i class="fas fa-times ml-1"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Elements Section -->
+        <section id="key-elements" class="py-20 bg-gradient-to-b from-gray-900 to-gray-800">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-4xl font-bold mb-16 text-center">Key Elements of the Court Opinion</h2>
+                
+                <!-- Core Legal Issues -->
+                <div class="mb-20">
+                    <h3 class="text-3xl font-bold mb-12 text-amber-300 text-center">Core Legal Issues</h3>
+                    <p class="mb-10 text-xl text-center max-w-3xl mx-auto">Click on the argument cards you support. Vote totals are updated in real-time.</p>
+                    
+                    <!-- Voting Results -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 max-w-4xl mx-auto">
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl text-center border border-amber-800 card-hover">
+                            <h4 class="font-bold text-xl mb-3">Total Votes</h4>
+                            <div class="text-5xl font-bold text-amber-300 mt-2" id="totalVotes">0</div>
+                        </div>
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl text-center border border-red-800 card-hover">
+                            <h4 class="font-bold text-xl mb-3">Sullivan Side</h4>
+                            <div class="text-5xl font-bold text-red-400 mt-2" id="sullivanVotes">0</div>
+                        </div>
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl text-center border border-green-800 card-hover">
+                            <h4 class="font-bold text-xl mb-3">NYT Side</h4>
+                            <div class="text-5xl font-bold text-green-400 mt-2" id="nytVotes">0</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Issue 1 -->
+                    <div class="mb-14">
+                        <h4 class="text-2xl font-bold mb-8 text-center gold-accent">Issue 1: Whether State Libel Law Violates Freedom of Speech and Press</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Sullivan Side -->
+                            <div class="argument-card argument-card-left card-hover hover-glow">
+                                <h5 class="font-bold text-xl mb-5 text-red-300">Sullivan & Alabama Side</h5>
+                                <ul class="space-y-4 mb-8">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-gavel text-red-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">State libel law is valid (presumes falsity/malice, defendants prove truth)</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-gavel text-red-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">1st Amendment doesn't protect libel; 14th Amendment ignores private libel</span>
+                                    </li>
+                                </ul>
+                                <p class="text-gray-400 italic text-base mb-6">1. 州诽谤法合法（推定虚假 / 恶意，被告自证真实）<br>2. 第一修正案不护诽谤，第十四修正案不管私人诽谤</p>
+                                <button class="vote-btn bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-6 rounded-lg w-full transition shadow-lg" data-side="sullivan" data-issue="1">Vote for this argument</button>
+                            </div>
+                            
+                            <!-- NYT Side -->
+                            <div class="argument-card argument-card-right card-hover hover-glow">
+                                <h5 class="font-bold text-xl mb-5 text-green-300">NYT & Supreme Court Side</h5>
+                                <ul class="space-y-4 mb-8">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-balance-scale text-green-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">State law violates 1st/14th Amendments (unfair burden, chills debate)</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-balance-scale text-green-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">Civil rights ad deserves protection despite minor factual errors</span>
+                                    </li>
+                                </ul>
+                                <p class="text-gray-400 italic text-base mb-6">1. 州法违宪（举证不公，压制辩论）<br>2. 民权广告虽有小错，仍应受宪法保护</p>
+                                <button class="vote-btn bg-gradient-to-r from-green-700 to-green-800 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-6 rounded-lg w-full transition shadow-lg" data-side="nyt" data-issue="1">Vote for this argument</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Issue 2 -->
+                    <div class="mb-14">
+                        <h4 class="text-2xl font-bold mb-8 text-center gold-accent">Issue 2: Boundary Between Public Official Reputation and Public Oversight Rights</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Sullivan Side -->
+                            <div class="argument-card argument-card-left card-hover hover-glow">
+                                <h5 class="font-bold text-xl mb-5 text-red-300">Sullivan & Alabama Side</h5>
+                                <ul class="space-y-4 mb-8">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-gavel text-red-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">Criticizing police = criticizing Sullivan's work</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-gavel text-red-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">False claims about his agency harm his reputation (actionable)</span>
+                                    </li>
+                                </ul>
+                                <p class="text-gray-400 italic text-base mb-6">1. 批评警方即批评沙利文履职<br>2. 涉其机构的不实言论可索赔</p>
+                                <button class="vote-btn bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-6 rounded-lg w-full transition shadow-lg" data-side="sullivan" data-issue="2">Vote for this argument</button>
+                            </div>
+                            
+                            <!-- NYT Side -->
+                            <div class="argument-card argument-card-right card-hover hover-glow">
+                                <h5 class="font-bold text-xl mb-5 text-green-300">NYT & Supreme Court Side</h5>
+                                <ul class="space-y-4 mb-8">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-balance-scale text-green-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">Officials must accept work-related criticism (democratic oversight)</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-balance-scale text-green-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">Official reputation can't override public debate rights</span>
+                                    </li>
+                                </ul>
+                                <p class="text-gray-400 italic text-base mb-6">1. 公职人员须接受履职批评（民主监督）<br>2. 公职名誉不能凌驾于公众辩论权</p>
+                                <button class="vote-btn bg-gradient-to-r from-green-700 to-green-800 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-6 rounded-lg w-full transition shadow-lg" data-side="nyt" data-issue="2">Vote for this argument</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Issue 3 -->
+                    <div class="mb-14">
+                        <h4 class="text-2xl font-bold mb-8 text-center gold-accent">Issue 3: Whether Requiring Proof of "Actual Malice" is Reasonable</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Sullivan Side -->
+                            <div class="argument-card argument-card-left card-hover hover-glow">
+                                <h5 class="font-bold text-xl mb-5 text-red-300">Sullivan & Alabama Side</h5>
+                                <ul class="space-y-4 mb-8">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-gavel text-red-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">Presuming malice is a long-standing state rule (ensures accountability)</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-gavel text-red-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">"Actual malice" standard lets media avoid liability for false claims</span>
+                                    </li>
+                                </ul>
+                                <p class="text-gray-400 italic text-base mb-6">1. 推定恶意是州法惯例（保障追责）<br>2. "实际恶意" 标准会让媒体不实言论脱责</p>
+                                <button class="vote-btn bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-6 rounded-lg w-full transition shadow-lg" data-side="sullivan" data-issue="3">Vote for this argument</button>
+                            </div>
+                            
+                            <!-- NYT Side -->
+                            <div class="argument-card argument-card-right card-hover hover-glow">
+                                <h5 class="font-bold text-xl mb-5 text-green-300">NYT & Supreme Court Side</h5>
+                                <ul class="space-y-4 mb-8">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-balance-scale text-green-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">Standard prevents self-censorship (critics don't need absolute truth)</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-balance-scale text-green-400 mt-1 mr-3"></i>
+                                        <span class="text-lg">Balances oversight/reputation (only punishes intentional falsehoods)</span>
+                                    </li>
+                                </ul>
+                                <p class="text-gray-400 italic text-base mb-6">1. 该标准避免自我审查（无需证明绝对真实）<br>2. 平衡监督权与名誉权（仅罚故意不实言论）</p>
+                                <button class="vote-btn bg-gradient-to-r from-green-700 to-green-800 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-6 rounded-lg w-full transition shadow-lg" data-side="nyt" data-issue="3">Vote for this argument</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- The Ruling -->
+                <div class="mb-20">
+                    <h3 class="text-3xl font-bold mb-12 text-amber-300 text-center">The Ruling</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800 card-hover hover-glow">
+                            <div class="text-amber-300 text-5xl mb-6 text-center">
+                                <i class="fas fa-gavel"></i>
+                            </div>
+                            <h4 class="font-bold text-2xl mb-5 text-center">Overturned Alabama Decision</h4>
+                            <p class="text-lg">The Supreme Court overturned Alabama courts' decisions, ruling that Alabama's libel rules failed to protect speech and press freedoms and were unconstitutional.</p>
+                            <p class="mt-4 text-gray-400 italic">联邦最高法院推翻了亚拉巴马州各级法院的判决，认定该州的诽谤规则未保障言论与新闻自由，不符合宪法规定。</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800 card-hover hover-glow">
+                            <div class="text-amber-300 text-5xl mb-6 text-center">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <h4 class="font-bold text-2xl mb-5 text-center">"Actual Malice" Rule</h4>
+                            <p class="text-lg">It created the "actual malice" rule: a public official can only get damages for defamatory lies about their work if they prove the speaker had actual malice.</p>
+                            <p class="mt-4 text-gray-400 italic">确立 "实际恶意" 规则：公职人员只有举证证明表述发布方存在 "实际恶意"，才能就与其履职相关的诽谤性虚假表述获赔。</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800 card-hover hover-glow">
+                            <div class="text-amber-300 text-5xl mb-6 text-center">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h4 class="font-bold text-2xl mb-5 text-center">Burden of Proof Shifted</h4>
+                            <p class="text-lg">The burden of proof shifted to the official (plaintiff), not the media (defendant).</p>
+                            <p class="mt-4 text-gray-400 italic">举证责任转移至公职人员原告一方，而非由媒体被告承担。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Significance -->
+                <div class="mb-20">
+                    <h3 class="text-3xl font-bold mb-12 text-amber-300 text-center">Significance</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800">
+                            <h4 class="font-bold text-2xl mb-5">Landmark First Amendment Protection</h4>
+                            <p class="text-lg">It was a landmark case that strengthened First Amendment protections for media and citizens criticizing public officials.</p>
+                            <p class="mt-4 text-gray-400 italic">这是一起里程碑案件，强化了宪法第一修正案对媒体和公民批评公职人员的权利保护</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800">
+                            <h4 class="font-bold text-2xl mb-5">Extended Protections to States</h4>
+                            <p class="text-lg">It made clear that the Fourteenth Amendment extends First Amendment speech protections to state courts, limiting states' power to issue huge libel damages.</p>
+                            <p class="mt-4 text-gray-400 italic">明确了宪法第十四修正案将第一修正案的言论自由保障延伸至州法院，限制了各州施加高额诽谤赔偿金的权力。</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800">
+                            <h4 class="font-bold text-2xl mb-5">"Actual Malice" Standard Applied Broadly</h4>
+                            <p class="text-lg">The "actual malice" rule became a key part of U.S. defamation law and later applied to public figures beyond elected officials.</p>
+                            <p class="mt-4 text-gray-400 italic">"实际恶意" 规则成为美国诽谤法核心准则，后续还拓展适用于公职人员之外的公众人物。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Case Genealogy Timeline -->
+                <div>
+                    <h3 class="text-3xl font-bold mb-12 text-amber-300 text-center">Case Genealogy Timeline</h3>
+                    <p class="mb-10 text-xl text-center max-w-3xl mx-auto">Drag the timeline slider to explore how the "actual malice" standard evolved in subsequent landmark cases.</p>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800">
+                        <div class="case-connection-chart" id="caseChart"></div>
+                        
+                        <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-bold text-xl mb-4 text-amber-300">Selected Case Details</h4>
+                                <div id="caseDetails" class="bg-gradient-to-br from-gray-900 to-gray-800 p-5 rounded-lg border border-gray-700 min-h-[150px]">
+                                    <p class="text-gray-400">Select a case on the chart to see details here.</p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-bold text-xl mb-4 text-amber-300">Connection Score</h4>
+                                <div id="connectionScore" class="bg-gradient-to-br from-gray-900 to-gray-800 p-5 rounded-lg border border-gray-700">
+                                    <div class="flex items-center">
+                                        <div class="text-4xl font-bold text-amber-300 mr-4">★★★★★</div>
+                                        <div>
+                                            <p class="font-bold text-lg">New York Times Co. v. Sullivan (1964)</p>
+                                            <p class="text-sm text-gray-400">Highest connection - establishes the "actual malice" standard</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Legal Knowledge Base -->
+        <section id="knowledge" class="py-20 bg-gradient-to-b from-gray-900 to-gray-800">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-4xl font-bold mb-16 text-center">Legal Knowledge Base</h2>
+                
+                <!-- Core Legal Terms -->
+                <div class="mb-20">
+                    <h3 class="text-3xl font-bold mb-12 text-amber-300 text-center">20 Core Legal Terms</h3>
+                    <p class="mb-10 text-xl text-center max-w-3xl mx-auto">Hover over each term card to see the definition and case context.</p>
+                    
+                    <!-- 前4个术语卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- Term 1: Libel -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Libel</h4>
+                                    <p class="text-lg">书面诽谤</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The respondent (L.B. Sullivan) alleged that the full-page advertisement in The New York Times constituted libel against him, as it contained false statements about the Montgomery police force under his supervision.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 2: Libel per se -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Libel per se</h4>
+                                    <p class="text-lg">本身诽谤（无需证明实际损害即可认定的诽谤）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The trial court in Alabama ruled that the advertisement was libel per se, holding that legal injury was implied from the mere fact of publication, and falsity and malice were presumed.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 3: Actual malice -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Actual malice</h4>
+                                    <p class="text-lg">实际恶意（明知虚假或罔顾真相的主观状态）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The Supreme Court held that a public official cannot recover damages for defamatory falsehoods about official conduct unless they prove the statement was made with actual malice.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 4: First Amendment -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">First Amendment</h4>
+                                    <p class="text-lg">美国宪法第一修正案（保障言论、新闻等自由）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The petitioners argued that the Alabama libel rule violated the First Amendment by unduly restricting the freedom of speech and press for critics of public officials.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第5-8个术语卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- Term 5: Fourteenth Amendment -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Fourteenth Amendment</h4>
+                                    <p class="text-lg">美国宪法第十四修正案（将联邦权利适用于州政府行为）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The Court emphasized that the Fourteenth Amendment makes the First Amendment's speech protections applicable to state courts, invalidating Alabama's overly restrictive libel law.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 6: Public official -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Public official</h4>
+                                    <p class="text-lg">公共官员（经选举或任命履职的政府公职人员）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">As a public official (Commissioner of Public Affairs in Montgomery), Sullivan was required to meet the higher standard of proving actual malice to succeed in his libel claim.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 7: Reckless disregard -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Reckless disregard</h4>
+                                    <p class="text-lg">罔顾真相（对陈述真实性的漠视状态）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The evidence showed that The New York Times did not act with reckless disregard for the truth of the advertisement, as it relied on the good reputation of the ad's sponsors and had no reason to doubt its contents.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 8: Freedom of the press -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Freedom of the press</h4>
+                                    <p class="text-lg">新闻自由</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The case reinforced the principle that freedom of the press includes the right to criticize public officials, even with minor factual inaccuracies, as long as there is no actual malice.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第9-12个术语卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- Term 9: Punitive damages -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Punitive damages</h4>
+                                    <p class="text-lg">惩罚性赔偿（惩罚被告恶意行为的赔偿）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">Sullivan sought $500,000 in damages, including punitive damages, from The New York Times and the individual petitioners for the alleged libel.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 10: Compensatory damages -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Compensatory damages</h4>
+                                    <p class="text-lg">补偿性赔偿（弥补实际损失的赔偿）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The Alabama court presumed compensatory damages for Sullivan without requiring proof of pecuniary injury, a ruling the Supreme Court later overturned as unconstitutional.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 11: State action -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">State action</h4>
+                                    <p class="text-lg">州行为（州政府或其机构行使公权力的行为）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The application of Alabama's libel law by state courts constituted state action, which must comply with the Fourteenth Amendment's protections for free speech.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 12: Burden of proof -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Burden of proof</h4>
+                                    <p class="text-lg">举证责任</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The Supreme Court shifted the burden of proof to Sullivan, requiring him to demonstrate that the advertisement was published with actual malice, rather than forcing the Times to prove the statement's truth.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第13-16个术语卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- Term 13: Judicial review -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Judicial review</h4>
+                                    <p class="text-lg">司法审查</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The Supreme Court exercised judicial review to invalidate Alabama's libel rule, finding it incompatible with the First and Fourteenth Amendments.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 14: Public concern -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Public concern</h4>
+                                    <p class="text-lg">公共议题（涉及公共利益或公众事务的议题）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The advertisement, which addressed civil rights protests and racial injustice, was deemed a matter of public concern, entitling it to stronger speech protections.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 15: Privilege of comment -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Privilege of comment</h4>
+                                    <p class="text-lg">评论特权（对公共议题批评的免责特权）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The Court recognized that citizens and media enjoy the privilege of comment when criticizing public officials, shielding them from liability for non-malicious factual errors.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 16: Presumption of falsity -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Presumption of falsity</h4>
+                                    <p class="text-lg">虚假推定（法律上直接推定言论虚假的规则）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">Alabama's presumption of falsity for libel per se statements was struck down, as it violated the First Amendment by placing an unfair burden on the press.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第17-20个术语卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- Term 17: Retraction demand -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Retraction demand</h4>
+                                    <p class="text-lg">更正要求（要求被告公开更正虚假陈述的请求）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">Sullivan sent a retraction demand to The New York Times, which responded by questioning how the advertisement reflected on him, rather than publishing a retraction.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 18: Seditious libel -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Seditious libel</h4>
+                                    <p class="text-lg">煽动性诽谤（批评政府的诽谤行为，历史术语）</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The Court referenced the historical invalidity of seditious libel laws (e.g., the 1798 Sedition Act) to support its ruling that criticism of public officials is protected speech.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 19: Due process of law -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Due process of law</h4>
+                                    <p class="text-lg">正当法律程序</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The Supreme Court held that Alabama's libel rule violated due process of law by presuming malice and damages without affording the press a fair opportunity to defend itself.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Term 20: Defamatory falsehood -->
+                        <div class="term-card">
+                            <div class="term-card-inner">
+                                <div class="term-card-front">
+                                    <h4 class="font-bold text-xl mb-3">Defamatory falsehood</h4>
+                                    <p class="text-lg">诽谤性虚假陈述</p>
+                                    <div class="flip-hint">
+                                        <i class="fas fa-sync-alt mr-2"></i> Hover to flip
+                                    </div>
+                                </div>
+                                <div class="term-card-back">
+                                    <h5 class="font-bold text-lg mb-3 text-amber-300">Case Context Example</h5>
+                                    <p class="text-sm leading-relaxed">The Court acknowledged that the advertisement contained some defamatory falsehoods (e.g., "Dr. King was arrested seven times"), but ruled they were protected due to the lack of actual malice.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 重要短语 -->
+                <div class="mb-20">
+                    <h3 class="text-3xl font-bold mb-12 text-amber-300 text-center">10 Important Phrases</h3>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800 overflow-x-auto">
+                        <table class="phrase-table">
+                            <thead>
+                                <tr>
+                                    <th class="py-4 px-6 text-left text-lg">English Phrase</th>
+                                    <th class="py-4 px-6 text-left text-lg">Chinese Meaning</th>
+                                    <th class="py-4 px-6 text-left text-lg">Case Context Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="py-4 px-6 font-bold text-lg">Knowledge of falsity</td>
+                                    <td class="py-4 px-6">明知虚假</td>
+                                    <td class="py-4 px-6">The record contained no evidence that the Times acted with knowledge of falsity when publishing the advertisement, as its staff had no reason to doubt the ad's accuracy.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-6 font-bold text-lg">Reckless disregard for truth</td>
+                                    <td class="py-4 px-6">罔顾真相</td>
+                                    <td class="py-4 px-6">The Court ruled that the Times' failure to verify the ad's contents did not constitute reckless disregard for truth, as it relied on reputable sponsors for validation.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-6 font-bold text-lg">Freedom of speech and press</td>
+                                    <td class="py-4 px-6">言论与新闻自由</td>
+                                    <td class="py-4 px-6">The core issue of the case was whether Alabama's libel law unduly restricted freedom of speech and press for those criticizing public officials.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-6 font-bold text-lg">Public official conduct</td>
+                                    <td class="py-4 px-6">公共官员公务行为</td>
+                                    <td class="py-4 px-6">The Supreme Court limited its ruling to criticism of public official conduct, emphasizing that private conduct of public officials is not entitled to the same speech protections.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-6 font-bold text-lg">State libel law</td>
+                                    <td class="py-4 px-6">州诽谤法</td>
+                                    <td class="py-4 px-6">The Court found that state libel law in Alabama was constitutionally deficient, as it failed to protect the press from unwarranted libel liability.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-6 font-bold text-lg">Uninhibited robust debate</td>
+                                    <td class="py-4 px-6">无拘无束且充满活力的辩论</td>
+                                    <td class="py-4 px-6">The Court emphasized that uninhibited robust debate on public issues is essential to democracy, even if it includes sharp criticism of government officials.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-6 font-bold text-lg">Privileged communication</td>
+                                    <td class="py-4 px-6">特权通信（享有免责的言论 / 信息交流）</td>
+                                    <td class="py-4 px-6">The advertisement qualified as privileged communication because it addressed a matter of public concern and was published without actual malice.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-6 font-bold text-lg">Constitutional limitation</td>
+                                    <td class="py-4 px-6">宪法限制</td>
+                                    <td class="py-4 px-6">The case clarified that constitutional limitation bars states from enforcing libel rules that chill criticism of public officials.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-6 font-bold text-lg">Actual injury</td>
+                                    <td class="py-4 px-6">实际损害</td>
+                                    <td class="py-4 px-6">Alabama's rule allowing recovery without proof of actual injury was overturned, as it conflicted with the First Amendment's speech protections.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-6 font-bold text-lg">Fair comment privilege</td>
+                                    <td class="py-4 px-6">公正评论特权</td>
+                                    <td class="py-4 px-6">The Court reaffirmed the fair comment privilege for media and citizens, holding that critical opinions about public officials are shielded from liability if based on true or privileged facts.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 典型句型 -->
+                <div class="mb-16">
+                    <h3 class="text-3xl font-bold mb-12 text-amber-300 text-center">5 Typical Sentence Patterns</h3>
+                    
+                    <div class="space-y-8">
+                        <!-- Sentence 1 -->
+                        <div class="sentence-pattern card-hover">
+                            <h4 class="font-bold text-2xl mb-4 gold-accent">We hold that...</h4>
+                            <p class="text-gray-400 text-lg mb-4">本院认为……</p>
+                            <p class="mb-5 italic text-lg">"We hold that a public official may not recover damages for a defamatory falsehood relating to his official conduct unless he proves that the statement was made with 'actual malice'."</p>
+                            <div class="bg-gradient-to-r from-amber-900 to-transparent p-4 rounded-lg">
+                                <p class="text-amber-300 font-medium">学习要点：是法院发布有约束力裁判规则或最终结论的核心司法用语，具有权威性，常用于判决书 "裁判要点" 部分，后接具体法律规则或结论。</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Sentence 2 -->
+                        <div class="sentence-pattern card-hover">
+                            <h4 class="font-bold text-2xl mb-4 gold-accent">[Rule] is inconsistent with [constitutional provision]</h4>
+                            <p class="text-gray-400 text-lg mb-4">[某规则] 与 [宪法条款] 相抵触</p>
+                            <p class="mb-5 italic text-lg">"Such a presumption [of malice under Alabama law] is inconsistent with the federal rule protected by the First and Fourteenth Amendments."</p>
+                            <div class="bg-gradient-to-r from-amber-900 to-transparent p-4 rounded-lg">
+                                <p class="text-amber-300 font-medium">学习要点：用于宣告某法律或规则违宪的核心句型，需明确指出规则与宪法条款的冲突点，体现宪法对州立法和司法权的约束，常见于宪法性案件的法律分析部分。</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Sentence 3 -->
+                        <div class="sentence-pattern card-hover">
+                            <h4 class="font-bold text-2xl mb-4 gold-accent">[Right] is essential to [democratic value]</h4>
+                            <p class="text-gray-400 text-lg mb-4">[某权利] 对 [民主价值] 至关重要</p>
+                            <p class="mb-5 italic text-lg">"Freedom of speech on public issues is essential to the maintenance of a responsive and accountable government."</p>
+                            <div class="bg-gradient-to-r from-amber-900 to-transparent p-4 rounded-lg">
+                                <p class="text-amber-300 font-medium">学习要点：用于将宪法权利与民主核心原则建立关联的句型，强调权利的基础性价值，可用于论证权利保护的必要性，多见于裁判文书的说理部分。</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Sentence 4 -->
+                        <div class="sentence-pattern card-hover">
+                            <h4 class="font-bold text-2xl mb-4 gold-accent">The burden of proof rests with [party] to prove [fact]</h4>
+                            <p class="text-gray-400 text-lg mb-4">[某方] 需承担证明 [某事实] 的举证责任</p>
+                            <p class="mb-5 italic text-lg">"The burden of proof rests with the public official to prove that the defendant acted with actual malice in publishing the defamatory statement."</p>
+                            <div class="bg-gradient-to-r from-amber-900 to-transparent p-4 rounded-lg">
+                                <p class="text-amber-300 font-medium">学习要点：用于明确诉讼中举证责任分配的标准句型，需清晰区分举证主体和待证事实，是厘清诉讼双方责任的关键表达，常见于证据认定相关的裁判内容。</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Sentence 5 -->
+                        <div class="sentence-pattern card-hover">
+                            <h4 class="font-bold text-2xl mb-4 gold-accent">[Conduct] is protected by the First Amendment because [reason]</h4>
+                            <p class="text-gray-400 text-lg mb-4">[某行为] 因 [某理由] 受第一修正案保护</p>
+                            <p class="mb-5 italic text-lg">"The advertisement is protected by the First Amendment because it addresses a matter of public concern and was published without actual malice."</p>
+                            <div class="bg-gradient-to-r from-amber-900 to-transparent p-4 rounded-lg">
+                                <p class="text-amber-300 font-medium">学习要点：用于衔接具体行为与第一修正案保护的框架句型，需说明行为符合宪法保护的核心理由，是言论自由类案件法律适用的核心表达。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Learning -->
+        <section id="interactive" class="py-20 bg-gradient-to-b from-gray-800 to-gray-900">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-4xl font-bold mb-16 text-center">Interactive Learning</h2>
+                
+                <!-- Pop-up Quiz -->
+                <div class="mb-20">
+                    <h3 class="text-3xl font-bold mb-12 text-amber-300 text-center">Pop-up Quiz</h3>
+                    <p class="mb-10 text-xl text-center max-w-3xl mx-auto">Test your knowledge of the case with these 5 questions. Click an answer to see immediate feedback.</p>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800">
+                        <!-- Quiz Progress and Reset Button -->
+                        <div class="flex justify-between items-center mb-10">
+                            <h4 class="font-bold text-2xl">First Amendment Quiz</h4>
+                            <div class="flex items-center space-x-4">
+                                <div class="text-xl">
+                                    <span id="currentQuestion">1</span> / 5
+                                </div>
+                                <button id="resetQuiz" class="reset-btn">
+                                    <i class="fas fa-redo mr-2"></i> Reset Quiz
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Quiz Questions -->
+                        <div id="quizContainer">
+                            <!-- Question 1 -->
+                            <div class="quiz-question active">
+                                <h5 class="font-bold text-xl mb-8">Question 1: Which of the following is the definition of "actual malice" under the ruling of New York Times Co. v. Sullivan?</h5>
+                                
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">A. Intent to harm a public official's personal reputation</span>
+                                </div>
+                                <div class="quiz-option" data-correct="true">
+                                    <span class="text-lg">B. Knowledge that a statement is false or reckless disregard for its truth</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">C. Failure to verify the accuracy of a statement before publication</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">D. Refusal to retract a statement after receiving a correction demand</span>
+                                </div>
+                                
+                                <div id="quizFeedback1" class="hidden mt-8 p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-green-500">
+                                    <h6 class="font-bold text-xl mb-3 text-green-400">Correct Answer: B</h6>
+                                    <p class="text-lg">Explanation: The Supreme Court's ruling in New York Times Co. v. Sullivan defines "actual malice" as the state of mind where the speaker knows a statement is false or acts with reckless disregard for whether it is true or false.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Question 2 (Hidden) -->
+                            <div class="quiz-question hidden">
+                                <h5 class="font-bold text-xl mb-8">Question 2: What type of damages does Alabama law require a retraction demand for before a public official can recover?</h5>
+                                
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">A. Compensatory damages</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">B. Nominal damages</span>
+                                </div>
+                                <div class="quiz-option" data-correct="true">
+                                    <span class="text-lg">C. Punitive damages</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">D. Statutory damages</span>
+                                </div>
+                                
+                                <div id="quizFeedback2" class="hidden mt-8 p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-green-500">
+                                    <h6 class="font-bold text-xl mb-3 text-green-400">Correct Answer: C</h6>
+                                    <p class="text-lg">Explanation: Under Alabama law (Alabama Code, Tit. 7, §914), a public official must first issue a written retraction demand to claim punitive damages in a libel action related to their official conduct.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Question 3 (Hidden) -->
+                            <div class="quiz-question hidden">
+                                <h5 class="font-bold text-xl mb-8">Question 3: Which constitutional amendment applies the First Amendment's speech protections to state courts?</h5>
+                                
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">A. Fifth Amendment</span>
+                                </div>
+                                <div class="quiz-option" data-correct="true">
+                                    <span class="text-lg">B. Fourteenth Amendment</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">C. Tenth Amendment</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">D. Twenty-First Amendment</span>
+                                </div>
+                                
+                                <div id="quizFeedback3" class="hidden mt-8 p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-green-500">
+                                    <h6 class="font-bold text-xl mb-3 text-green-400">Correct Answer: B</h6>
+                                    <p class="text-lg">Explanation: The Fourteenth Amendment applies the First Amendment's speech and press freedoms to state courts, restricting states from enforcing laws that infringe on these constitutional rights.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Question 4 (Hidden) -->
+                            <div class="quiz-question hidden">
+                                <h5 class="font-bold text-xl mb-8">Question 4: A statement that is inherently defamatory and actionable without proof of actual harm is called:</h5>
+                                
+                                <div class="quiz-option" data-correct="true">
+                                    <span class="text-lg">A. Libel per se</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">B. Seditious libel</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">C. Defamatory falsehood</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">D. Malicious publication</span>
+                                </div>
+                                
+                                <div id="quizFeedback4" class="hidden mt-8 p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-green-500">
+                                    <h6 class="font-bold text-xl mb-3 text-green-400">Correct Answer: A</h6>
+                                    <p class="text-lg">Explanation: Libel per se refers to statements that are inherently defamatory and actionable without the need to prove actual pecuniary harm, such as attacks on an official's integrity or professional reputation.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Question 5 (Hidden) -->
+                            <div class="quiz-question hidden">
+                                <h5 class="font-bold text-xl mb-8">Question 5: For a public official to win a libel suit against media, who bears the burden of proving "actual malice"?</h5>
+                                
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">A. The media defendant</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">B. The trial court jury</span>
+                                </div>
+                                <div class="quiz-option" data-correct="true">
+                                    <span class="text-lg">C. The public official plaintiff</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="text-lg">D. The state attorney general</span>
+                                </div>
+                                
+                                <div id="quizFeedback5" class="hidden mt-8 p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-green-500">
+                                    <h6 class="font-bold text-xl mb-3 text-green-400">Correct Answer: C</h6>
+                                    <p class="text-lg">Explanation: The ruling shifts the burden of proof to the public official (plaintiff), who must demonstrate that the media defendant acted with "actual malice" to win a libel claim.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quiz Navigation -->
+                        <div class="flex justify-between mt-10">
+                            <button id="prevQuestion" class="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white font-bold py-3 px-8 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition shadow-lg" disabled>Previous</button>
+                            <button id="nextQuestion" class="bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg">Next Question</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Scenario Voting - 完全修复版本 -->
+                <div>
+                    <h3 class="text-3xl font-bold mb-12 text-amber-300 text-center">Scenario Voting</h3>
+                    <p class="mb-10 text-xl text-center max-w-3xl mx-auto">Apply the Sullivan ruling to real-world scenarios. Vote Yes or No, then see analysis based on the case precedent.</p>
+                    
+                    <div class="space-y-10">
+                        <!-- Scenario 1 - 完全修复 -->
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800">
+                            <div class="flex justify-between items-center mb-6">
+                                <h4 class="font-bold text-2xl">Scenario 1</h4>
+                                <button class="reset-scenario reset-btn" data-scenario="1">
+                                    <i class="fas fa-redo mr-2"></i> Reset
+                                </button>
+                            </div>
+                            <p class="mb-8 text-lg">A local blogger posts an article claiming a city mayor accepted bribes (with minor factual errors about the bribe amount). Should the blogger be liable for libel?</p>
+                            
+                            <div class="mb-6">
+                                <h5 class="font-bold text-lg mb-3 text-gray-300">Cast Your Vote:</h5>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="vote-option scenario-option" data-scenario="1" data-choice="yes" data-correct="false">
+                                        <span class="text-lg">Vote: Yes</span>
+                                    </div>
+                                    <div class="vote-option scenario-option" data-scenario="1" data-choice="no" data-correct="true">
+                                        <span class="text-lg">Vote: No</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="scenarioResult1" class="hidden">
+                                <div class="p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-amber-500 mb-4">
+                                    <h5 class="font-bold text-xl mb-2 text-amber-300">Your Vote: <span id="userVote1"></span></h5>
+                                    <h5 class="font-bold text-xl mb-2 text-green-400">Recommended Vote: No</h5>
+                                </div>
+                                
+                                <div id="scenarioAnalysis1" class="p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-green-500">
+                                    <h5 class="font-bold text-xl mb-3 text-green-400">Analysis</h5>
+                                    <p class="text-lg">Per the Sullivan ruling, the blogger is not liable for libel. The minor factual error about the bribe amount does not constitute "actual malice" (the blogger had no knowledge of falsity or reckless disregard for truth). Criticism of a mayor's alleged corruption is a matter of public concern, entitled to First Amendment protection.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Scenario 2 - 完全修复 -->
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800">
+                            <div class="flex justify-between items-center mb-6">
+                                <h4 class="font-bold text-2xl">Scenario 2</h4>
+                                <button class="reset-scenario reset-btn" data-scenario="2">
+                                    <i class="fas fa-redo mr-2"></i> Reset
+                                </button>
+                            </div>
+                            <p class="mb-8 text-lg">A nonprofit runs a public service ad about a county's flawed waste management (with an incorrect statistic about landfill capacity). Should the county supervisor win a libel claim?</p>
+                            
+                            <div class="mb-6">
+                                <h5 class="font-bold text-lg mb-3 text-gray-300">Cast Your Vote:</h5>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="vote-option scenario-option" data-scenario="2" data-choice="yes" data-correct="false">
+                                        <span class="text-lg">Vote: Yes</span>
+                                    </div>
+                                    <div class="vote-option scenario-option" data-scenario="2" data-choice="no" data-correct="true">
+                                        <span class="text-lg">Vote: No</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="scenarioResult2" class="hidden">
+                                <div class="p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-amber-500 mb-4">
+                                    <h5 class="font-bold text-xl mb-2 text-amber-300">Your Vote: <span id="userVote2"></span></h5>
+                                    <h5 class="font-bold text-xl mb-2 text-green-400">Recommended Vote: No</h5>
+                                </div>
+                                
+                                <div id="scenarioAnalysis2" class="p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-green-500">
+                                    <h5 class="font-bold text-xl mb-3 text-green-400">Analysis</h5>
+                                    <p class="text-lg">The county supervisor cannot win the libel claim. The nonprofit's ad addresses public interest (waste management), and the incorrect landfill statistic is a minor factual error, not evidence of "actual malice." Under Sullivan, public officials must prove "actual malice" to recover damages for criticism of official conduct.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Scenario 3 - 完全修复 -->
+                        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl border border-amber-800">
+                            <div class="flex justify-between items-center mb-6">
+                                <h4 class="font-bold text-2xl">Scenario 3</h4>
+                                <button class="reset-scenario reset-btn" data-scenario="3">
+                                    <i class="fas fa-redo mr-2"></i> Reset
+                                </button>
+                            </div>
+                            <p class="mb-8 text-lg">A national news outlet reports that a congressperson blocked a bill to benefit corporate donors (the congressperson did block the bill, but the donor link is unsubstantiated). Is the outlet protected by the "actual malice" standard?</p>
+                            
+                            <div class="mb-6">
+                                <h5 class="font-bold text-lg mb-3 text-gray-300">Cast Your Vote:</h5>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="vote-option scenario-option" data-scenario="3" data-choice="yes" data-correct="true">
+                                        <span class="text-lg">Vote: Yes</span>
+                                    </div>
+                                    <div class="vote-option scenario-option" data-scenario="3" data-choice="no" data-correct="false">
+                                        <span class="text-lg">Vote: No</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="scenarioResult3" class="hidden">
+                                <div class="p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-amber-500 mb-4">
+                                    <h5 class="font-bold text-xl mb-2 text-amber-300">Your Vote: <span id="userVote3"></span></h5>
+                                    <h5 class="font-bold text-xl mb-2 text-green-400">Recommended Vote: Yes</h5>
+                                </div>
+                                
+                                <div id="scenarioAnalysis3" class="p-5 bg-gradient-to-r from-gray-900 to-transparent rounded-lg border-l-4 border-green-500">
+                                    <h5 class="font-bold text-xl mb-3 text-green-400">Analysis</h5>
+                                    <p class="text-lg">The news outlet is protected by the "actual malice" standard. The core claim (the congressperson blocked the bill) is true, and the unsubstantiated donor link does not show "actual malice" (no proof the outlet knew it was false or disregarded the truth). The report involves a public official's conduct, which falls under the Sullivan standard's scope.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-b from-gray-900 to-black py-10 border-t border-amber-900">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-yellow-600 to-amber-800 rounded-full flex items-center justify-center">
+                            <i class="fas fa-balance-scale text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold">NYT v. Sullivan (1964)</h3>
+                    </div>
+                    <p class="text-gray-400">First Amendment Landmark Case Study</p>
+                </div>
+                <div class="text-gray-400 text-center md:text-right">
+                    <p class="text-lg">Designed by Runhan Zhang</p>
+                    <p class="text-sm mt-2">Educational Project - All case materials are for educational purposes</p>
+                </div>
+            </div>
+            <div class="mt-10 pt-6 border-t border-gray-800 text-center text-gray-500">
+                <p>© 2023 First Amendment Educational Resource. This site is for educational purposes only.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        });
+        
+        // Fact Check Cards
+        const factHighlights = document.querySelectorAll('.ad-highlight');
+        const factCards = {
+            '1': document.getElementById('factCheckCard1'),
+            '2': document.getElementById('factCheckCard2'),
+            '3': document.getElementById('factCheckCard3'),
+            '4': document.getElementById('factCheckCard4')
+        };
+        
+        // Track active fact card
+        let activeFactCard = null;
+        
+        factHighlights.forEach(highlight => {
+            highlight.addEventListener('click', function(e) {
+                const factNum = this.getAttribute('data-fact');
+                
+                // Hide any currently active card
+                if (activeFactCard) {
+                    activeFactCard.style.display = 'none';
+                }
+                
+                // Show the clicked card
+                const card = factCards[factNum];
+                if (card) {
+                    // Position the card near the clicked element
+                    const rect = this.getBoundingClientRect();
+                    card.style.top = `${rect.bottom + window.scrollY + 10}px`;
+                    
+                    // Ensure card doesn't go off screen
+                    const cardWidth = 320;
+                    if (rect.left + cardWidth > window.innerWidth) {
+                        card.style.left = `${rect.right + window.scrollX - cardWidth}px`;
+                    } else {
+                        card.style.left = `${rect.left + window.scrollX}px`;
+                    }
+                    
+                    card.style.display = 'block';
+                    activeFactCard = card;
+                    
+                    // Animate appearance
+                    anime({
+                        targets: card,
+                        scale: [0.8, 1],
+                        opacity: [0, 1],
+                        duration: 300,
+                        easing: 'easeOutExpo'
+                    });
+                }
+                
+                e.stopPropagation();
+            });
+        });
+        
+        // Close fact cards when clicking close button or outside
+        document.querySelectorAll('.close-fact').forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('.fact-check-card').style.display = 'none';
+                activeFactCard = null;
+            });
+        });
+        
+        document.addEventListener('click', function() {
+            if (activeFactCard) {
+                activeFactCard.style.display = 'none';
+                activeFactCard = null;
+            }
+        });
+        
+        // Prevent clicks inside fact cards from closing them
+        document.querySelectorAll('.fact-check-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+        
+        // Voting System
+        let voteCounts = {
+            total: 0,
+            sullivan: 0,
+            nyt: 0
+        };
+        
+        document.querySelectorAll('.vote-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const side = this.getAttribute('data-side');
+                
+                // Update vote counts
+                voteCounts.total++;
+                voteCounts[side]++;
+                
+                // Update display
+                document.getElementById('totalVotes').textContent = voteCounts.total;
+                document.getElementById('sullivanVotes').textContent = voteCounts.sullivan;
+                document.getElementById('nytVotes').textContent = voteCounts.nyt;
+                
+                // Animate the update
+                anime({
+                    targets: ['#totalVotes', '#sullivanVotes', '#nytVotes'],
+                    scale: [1.3, 1],
+                    duration: 400
+                });
+                
+                // Show success message
+                const sideName = side === 'sullivan' ? 'Sullivan' : 'New York Times';
+                const voteMessage = document.createElement('div');
+                voteMessage.className = 'fixed top-20 right-4 bg-gradient-to-r from-amber-800 to-amber-900 text-white p-4 rounded-lg shadow-xl z-50';
+                voteMessage.innerHTML = `<strong>Thank you for voting!</strong> You've supported the ${sideName} side. Total votes: ${voteCounts.total}`;
+                document.body.appendChild(voteMessage);
+                
+                // Remove message after 3 seconds
+                setTimeout(() => {
+                    voteMessage.remove();
+                }, 3000);
+            });
+        });
+        
+        // Quiz Functionality
+        let currentQuestion = 1;
+        const totalQuestions = 5;
+        
+        // Function to reset the quiz
+        function resetQuiz() {
+            currentQuestion = 1;
+            
+            // Reset all questions to initial state
+            document.querySelectorAll('.quiz-question').forEach((question, index) => {
+                if (index === 0) {
+                    question.classList.remove('hidden');
+                    question.classList.add('active');
+                } else {
+                    question.classList.add('hidden');
+                    question.classList.remove('active');
+                }
+                
+                // Clear all options
+                question.querySelectorAll('.quiz-option').forEach(option => {
+                    option.classList.remove('selected', 'correct-answer', 'wrong-answer');
+                });
+                
+                // Hide feedback
+                const feedback = document.getElementById(`quizFeedback${index + 1}`);
+                if (feedback) {
+                    feedback.classList.add('hidden');
+                }
+            });
+            
+            // Reset navigation buttons
+            document.getElementById('currentQuestion').textContent = currentQuestion;
+            document.getElementById('prevQuestion').disabled = true;
+            document.getElementById('nextQuestion').textContent = 'Next Question';
+            
+            // Remove any event listener that might have been added for finishing the quiz
+            const nextBtn = document.getElementById('nextQuestion');
+            const newNextBtn = nextBtn.cloneNode(true);
+            nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+            
+            // Re-attach event listener to the new button
+            document.getElementById('nextQuestion').addEventListener('click', handleNextQuestion);
+            
+            // Show success message
+            const resetMessage = document.createElement('div');
+            resetMessage.className = 'fixed top-20 right-4 bg-gradient-to-r from-blue-800 to-blue-900 text-white p-4 rounded-lg shadow-xl z-50';
+            resetMessage.innerHTML = `<strong>Quiz Reset!</strong> You can now start the quiz again.`;
+            document.body.appendChild(resetMessage);
+            
+            setTimeout(() => {
+                resetMessage.remove();
+            }, 3000);
+        }
+        
+        // Function to handle next question click
+        function handleNextQuestion() {
+            if (currentQuestion < totalQuestions) {
+                // Hide current question
+                document.querySelector(`.quiz-question:nth-child(${currentQuestion})`).classList.remove('active');
+                document.querySelector(`.quiz-question:nth-child(${currentQuestion})`).classList.add('hidden');
+                
+                // Show next question
+                currentQuestion++;
+                document.querySelector(`.quiz-question:nth-child(${currentQuestion})`).classList.remove('hidden');
+                document.querySelector(`.quiz-question:nth-child(${currentQuestion})`).classList.add('active');
+                
+                // Update counter
+                document.getElementById('currentQuestion').textContent = currentQuestion;
+                
+                // Enable/disable buttons
+                document.getElementById('prevQuestion').disabled = false;
+                
+                if (currentQuestion === totalQuestions) {
+                    this.textContent = 'Finish Quiz';
+                    this.addEventListener('click', function() {
+                        alert('Quiz completed! Check your answers above. Click "Reset Quiz" to try again.');
+                    }, { once: true });
+                }
+                
+                // Scroll to question
+                document.getElementById('quizContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // Attach event listeners to quiz options
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Don't allow changing answer after selection
+                if (this.classList.contains('selected')) return;
+                
+                // Remove selected class from all options in this question
+                const question = this.closest('.quiz-question');
+                question.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected', 'correct-answer', 'wrong-answer');
+                });
+                
+                // Mark this option as selected
+                this.classList.add('selected');
+                
+                // Check if correct
+                const isCorrect = this.getAttribute('data-correct') === 'true';
+                
+                // Apply appropriate styling
+                if (isCorrect) {
+                    this.classList.add('correct-answer');
+                } else {
+                    this.classList.add('wrong-answer');
+                    
+                    // Also highlight the correct answer
+                    question.querySelector('.quiz-option[data-correct="true"]').classList.add('correct-answer');
+                }
+                
+                // Show feedback
+                const feedbackId = `quizFeedback${currentQuestion}`;
+                const feedback = document.getElementById(feedbackId);
+                if (feedback) {
+                    feedback.classList.remove('hidden');
+                    
+                    // Animate feedback appearance
+                    anime({
+                        targets: `#${feedbackId}`,
+                        opacity: [0, 1],
+                        translateY: [10, 0],
+                        duration: 500
+                    });
+                }
+            });
+        });
+        
+        // Quiz Navigation
+        document.getElementById('nextQuestion').addEventListener('click', handleNextQuestion);
+        
+        document.getElementById('prevQuestion').addEventListener('click', function() {
+            if (currentQuestion > 1) {
+                // Hide current question
+                document.querySelector(`.quiz-question:nth-child(${currentQuestion})`).classList.remove('active');
+                document.querySelector(`.quiz-question:nth-child(${currentQuestion})`).classList.add('hidden');
+                
+                // Show previous question
+                currentQuestion--;
+                document.querySelector(`.quiz-question:nth-child(${currentQuestion})`).classList.remove('hidden');
+                document.querySelector(`.quiz-question:nth-child(${currentQuestion})`).classList.add('active');
+                
+                // Update counter
+                document.getElementById('currentQuestion').textContent = currentQuestion;
+                
+                // Enable/disable buttons
+                document.getElementById('prevQuestion').disabled = currentQuestion === 1;
+                document.getElementById('nextQuestion').textContent = 'Next Question';
+                
+                // Scroll to question
+                document.getElementById('quizContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+        
+        // Quiz Reset Button
+        document.getElementById('resetQuiz').addEventListener('click', resetQuiz);
+        
+        // Scenario Voting - 完全修复版本
+        document.querySelectorAll('.scenario-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const scenario = this.getAttribute('data-scenario');
+                const userChoice = this.getAttribute('data-choice');
+                const isCorrect = this.getAttribute('data-correct') === 'true';
+                
+                // 获取场景容器
+                const scenarioDiv = this.closest('.bg-gradient-to-br');
+                
+                // 清除该场景中所有选项的颜色类
+                scenarioDiv.querySelectorAll('.scenario-option').forEach(opt => {
+                    opt.classList.remove('scenario-correct', 'scenario-wrong');
+                });
+                
+                // 为所有选项设置正确/错误状态
+                scenarioDiv.querySelectorAll('.scenario-option').forEach(opt => {
+                    const optCorrect = opt.getAttribute('data-correct') === 'true';
+                    if (optCorrect) {
+                        opt.classList.add('scenario-correct');
+                    } else {
+                        opt.classList.add('scenario-wrong');
+                    }
+                });
+                
+                // 更新用户投票显示
+                const userVoteText = userChoice === 'yes' ? 'Yes' : 'No';
+                document.getElementById(`userVote${scenario}`).textContent = userVoteText;
+                
+                // 显示结果和分析
+                const resultDiv = document.getElementById(`scenarioResult${scenario}`);
+                resultDiv.classList.remove('hidden');
+                
+                // 动画显示结果
+                anime({
+                    targets: `#scenarioResult${scenario}`,
+                    opacity: [0, 1],
+                    translateY: [20, 0],
+                    duration: 600,
+                    easing: 'easeOutExpo'
+                });
+                
+                // 滚动到分析部分
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+        });
+        
+        // Scenario Reset Buttons
+        document.querySelectorAll('.reset-scenario').forEach(button => {
+            button.addEventListener('click', function() {
+                const scenario = this.getAttribute('data-scenario');
+                
+                // 获取场景容器
+                const scenarioDiv = this.closest('.bg-gradient-to-br');
+                
+                // 清除选项颜色
+                scenarioDiv.querySelectorAll('.scenario-option').forEach(opt => {
+                    opt.classList.remove('scenario-correct', 'scenario-wrong');
+                });
+                
+                // 隐藏结果和分析
+                const resultDiv = document.getElementById(`scenarioResult${scenario}`);
+                resultDiv.classList.add('hidden');
+                
+                // 显示成功消息
+                const resetMessage = document.createElement('div');
+                resetMessage.className = 'fixed top-20 right-4 bg-gradient-to-r from-blue-800 to-blue-900 text-white p-4 rounded-lg shadow-xl z-50';
+                resetMessage.innerHTML = `<strong>Scenario ${scenario} Reset!</strong> You can now vote again.`;
+                document.body.appendChild(resetMessage);
+                
+                setTimeout(() => {
+                    resetMessage.remove();
+                }, 3000);
+            });
+        });
+        
+        // Case Genealogy Chart
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize ECharts
+            const chartDom = document.getElementById('caseChart');
+            const myChart = echarts.init(chartDom, 'dark');
+            
+            // Case data
+            const caseData = [
+                { year: 1964, name: 'New York Times Co. v. Sullivan', score: 5, development: 'Establishes "actual malice" standard: Public officials must prove media knew statement was false or acted with reckless disregard.' },
+                { year: 1967, name: 'Time, Inc. v. Hill', score: 4, development: 'Extends to "false light" privacy torts: Applies "actual malice" to cases involving false portrayal of public figures.' },
+                { year: 1971, name: 'Rosenbloom v. Metromedia, Inc.', score: 3, development: 'Briefly extends to "public concern" issues: Applies "actual malice" to all matters of public interest, regardless of plaintiff status.' },
+                { year: 1974, name: 'Gertz v. Robert Welch, Inc.', score: 5, development: 'Narrows standard, introduces "negligence" liability: "Actual malice" does not apply to private individuals; they need only prove "negligence".' },
+                { year: 1979, name: 'Herbert v. Lando', score: 3, development: 'Allows inquiry into editorial process: Public officials can investigate journalists\' editorial decisions to prove "actual malice".' },
+                { year: 1988, name: 'Hustler Magazine v. Falwell', score: 4, development: 'Extends to intentional infliction of emotional distress: Protects parody of public figures unless "actual malice" is proven.' },
+                { year: 2011, name: 'Snyder v. Phelps', score: 3, development: 'Strengthens protection for "public concern" issues: Protects even highly offensive speech on public matters from tort liability.' }
+            ];
+            
+            // Prepare data for chart
+            const years = caseData.map(item => item.year);
+            const scores = caseData.map(item => item.score);
+            const names = caseData.map(item => item.name);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(params) {
+                        const data = caseData[params.dataIndex];
+                        return `<div style="padding: 10px;">
+                                <strong style="color: #d4af37; font-size: 16px;">${data.name}</strong><br/>
+                                <strong>Year:</strong> ${data.year}<br/>
+                                <strong>Connection Score:</strong> ${'★'.repeat(data.score)}${'☆'.repeat(5-data.score)}<br/>
+                                <strong>Key Development:</strong> ${data.development}
+                                </div>`;
+                    },
+                    backgroundColor: 'rgba(12, 26, 49, 0.95)',
+                    borderColor: '#d4af37',
+                    textStyle: { color: '#fff', fontSize: 14 },
+                    extraCssText: 'box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: years,
+                    axisLine: { 
+                        lineStyle: { 
+                            color: '#d4af37',
+                            width: 2
+                        } 
+                    },
+                    axisLabel: { 
+                        color: '#fff',
+                        fontSize: 14,
+                        fontWeight: 'bold'
+                    },
+                    axisTick: {
+                        lineStyle: {
+                            color: '#d4af37'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 0,
+                    max: 5,
+                    axisLine: { 
+                        lineStyle: { 
+                            color: '#d4af37',
+                            width: 2
+                        } 
+                    },
+                    axisLabel: { 
+                        color: '#fff',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        formatter: function(value) {
+                            return '★'.repeat(value) + '☆'.repeat(5-value);
+                        }
+                    },
+                    splitLine: { 
+                        lineStyle: { 
+                            color: 'rgba(255,255,255,0.1)',
+                            type: 'dashed'
+                        } 
+                    }
+                },
+                series: [
+                    {
+                        name: 'Connection Score',
+                        type: 'line',
+                        smooth: true,
+                        data: scores,
+                        lineStyle: { 
+                            color: '#d4af37', 
+                            width: 4,
+                            shadowBlur: 10,
+                            shadowColor: '#d4af37'
+                        },
+                        itemStyle: { 
+                            color: '#d4af37',
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            shadowBlur: 5,
+                            shadowColor: '#d4af37'
+                        },
+                        symbolSize: 12,
+                        markPoint: {
+                            data: [
+                                { type: 'max', name: 'Max', symbolSize: 30 },
+                                { type: 'min', name: 'Min', symbolSize: 30 }
+                            ],
+                            label: {
+                                color: '#fff',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        markLine: {
+                            data: [{ type: 'average', name: 'Average' }],
+                            lineStyle: {
+                                color: 'rgba(255,255,255,0.5)',
+                                type: 'dashed'
+                            },
+                            label: {
+                                color: '#fff',
+                                fontWeight: 'bold'
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            // Handle chart clicks
+            myChart.on('click', function(params) {
+                const dataIndex = params.dataIndex;
+                const caseInfo = caseData[dataIndex];
+                
+                // Update case details
+                const caseDetails = document.getElementById('caseDetails');
+                caseDetails.innerHTML = `
+                    <h5 class="font-bold text-xl mb-3 text-amber-300">${caseInfo.name} (${caseInfo.year})</h5>
+                    <p class="mb-3 text-lg">${caseInfo.development}</p>
+                    <p class="text-sm text-gray-400">Click on other points in the chart to see details of different cases.</p>
+                `;
+                
+                // Update connection score
+                const scoreStars = '★'.repeat(caseInfo.score) + '☆'.repeat(5-caseInfo.score);
+                const connectionScore = document.getElementById('connectionScore');
+                connectionScore.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="text-4xl font-bold text-amber-300 mr-4">${scoreStars}</div>
+                        <div>
+                            <p class="font-bold text-lg">${caseInfo.name} (${caseInfo.year})</p>
+                            <p class="text-sm text-gray-400">Connection score: ${caseInfo.score}/5</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Animate the update
+                anime({
+                    targets: [caseDetails, connectionScore],
+                    scale: [0.95, 1],
+                    duration: 300
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    const mobileMenu = document.getElementById('mobileMenu');
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        
+        // Initialize animations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate hero section
+            anime({
+                targets: 'header h1',
+                translateY: [-50, 0],
+                opacity: [0, 1],
+                duration: 1200,
+                easing: 'easeOutExpo'
+            });
+            
+            anime({
+                targets: 'header p',
+                translateY: [30, 0],
+                opacity: [0, 1],
+                duration: 1200,
+                delay: 400,
+                easing: 'easeOutExpo'
+            });
+            
+            anime({
+                targets: 'header .flex',
+                translateY: [30, 0],
+                opacity: [0, 1],
+                duration: 1200,
+                delay: 800,
+                easing: 'easeOutExpo'
+            });
+            
+            // Animate section titles when they come into view
+            const observerOptions = {
+                threshold: 0.3,
+                rootMargin: '0px 0px -100px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        anime({
+                            targets: entry.target,
+                            translateY: [20, 0],
+                            opacity: [0, 1],
+                            duration: 800,
+                            easing: 'easeOutExpo'
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all section titles
+            document.querySelectorAll('.section-title').forEach(title => {
+                observer.observe(title);
+            });
+        });
+    </script>
+</body>
+</html>
